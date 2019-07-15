@@ -59,5 +59,17 @@ class GistDeleteCest
         $I->assertEquals("Not Found", $response['message']);
 
     }
+    public function _after(ApiTester $I)
+    {
 
+        $I->haveHttpHeader("Authorization","Token ".getenv("OAUTH_TOKEN"));
+        $I->sendGET(getenv("GIST_BASE_URL")."/users/".getenv("GIST_USER")."/gists");
+        $I->seeResponseCodeIs(200);
+        $response= json_decode($I->grabResponse(),true);
+        for($j = 0; $j<count($response); $j++){
+            $I->sendDELETE(getenv("GIST_BASE_URL")."/gists/".$response[$j]['id']);
+        }
+        $I->deleteHeader("Authorization");
+
+    }
 }
